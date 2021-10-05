@@ -1,5 +1,6 @@
 import React, {useContext, useEffect, useState} from "react";
 import { Redirect, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 import UserContext from "./UserContext";
 import Job from './Job';
@@ -26,7 +27,7 @@ function Company() {
             <h1>{company.name}</h1>
             <p>{company.description}</p>
             {company.jobs.map((j) => {
-              return <Job jobDetails={j} />;
+              return <Job jobDetails={j} key={uuidv4()}/>;
             })}
           </div>
         </div>

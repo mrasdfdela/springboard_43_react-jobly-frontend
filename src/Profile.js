@@ -1,40 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Redirect, useHistory } from "react-router-dom";
-import { Button, Card, CardBody, Form, Input, Label } from "reactstrap";
+import { Card, CardBody, Form, Input, Label } from "reactstrap";
 
 import UserContext from "./UserContext";
 import "./Profile.css";
 
-function Profile({ getUserDetails, patchUserDetails }) {
+function Profile({ userDetails, patchUserDetails }) {
   const { currentUser } = useContext(UserContext);
   const history = useHistory();
-  const [formData, setFormData] = useState({});
-
-  useEffect(() => {
-    async function fillFormData(){
-      const u = await getUserDetails();
-      setFormData({
-        username: u.username,
-        firstName: u.firstName,
-        lastName: u.lastName,
-        email: u.email
-      });
-    }
-    fillFormData();
-  }, []);
+  const [formData, setFormData] = useState(userDetails);
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const resp = await patchUserDetails(formData);
-      setFormData({
-        username: resp.username,
-        firstName: resp.firstName,
-        lastName: resp.lastName,
-        email: resp.email,
-        password: ""
-      });
-    } catch(err) {
+      await patchUserDetails(formData);
+    } catch (err) {
       return err;
     }
     history.push("/");
@@ -88,9 +68,10 @@ function Profile({ getUserDetails, patchUserDetails }) {
                     name="password"
                     type="password"
                     placeholder="enter password"
+                    autoComplete="off"
                     onChange={handleChange}
                   />
-                  <Button className="btn-primary">Submit</Button>
+                  <button className="btn btn-primary">Submit</button>
                 </Form>
               </CardBody>
             </Card>

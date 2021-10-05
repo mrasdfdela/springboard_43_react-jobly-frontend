@@ -18,6 +18,7 @@ function App() {
   const [currentUser,setCurrentUser] = useState(null);
   const [currentToken,setCurrentToken] = useState(null);
   const [currentApps, setCurrentApps] = useState([]);
+  const [userDetails, setUserDetails] = useState({});
   // const history = useHistory();
 
   useEffect( ()=>{
@@ -47,7 +48,9 @@ function App() {
       const newToken = await JoblyApi.registerUser(formData);
       setCurrentUser(formData.username);
       setCurrentToken(newToken);
-      // history.push("/");
+      
+      const newUser = await getUserDetails(formData.username);
+      setUserDetails(newUser);
     } catch {
       console.log('...user not registered...')
     }
@@ -57,7 +60,9 @@ function App() {
       const newToken = await JoblyApi.authenticateUser(username, password);
       setCurrentUser(username);
       setCurrentToken(newToken);
-      // history.push("/");
+
+      const newUser = await getUserDetails(username); 
+      setUserDetails(newUser);
     } catch {
       console.log("...user not stored in session...")
     }
@@ -68,8 +73,8 @@ function App() {
     setCurrentToken(JoblyApi.token);
   }
 
-  function getUserDetails() {
-    return JoblyApi.getUser(currentUser);
+  function getUserDetails(username) {
+    return JoblyApi.getUser(username);
   }
   function patchUserDetails(formData) {
     return JoblyApi.patchUser(formData);
@@ -77,7 +82,6 @@ function App() {
 
   async function jobApplication(username,jobId){
     const newApp = await JoblyApi.applyForJob(username,jobId);
-    console.log(newApp)
     if (!newApp.applied) {
       // possible improvement: save new job application to cookies. Reference cookies at startup to set list of "applied to" jobs
       setCurrentApps([...currentApps, jobId])
@@ -90,7 +94,7 @@ function App() {
         currentUser: currentUser,
         currentToken: currentToken,
         currentApps: currentApps,
-        jobApplication: jobApplication
+        jobApplication: jobApplication,
       }}
     >
       <div className="App">
@@ -108,7 +112,7 @@ function App() {
             </Route>
             <Route exact path="/profile">
               <Profile
-                getUserDetails={getUserDetails}
+                userDetails={userDetails}
                 patchUserDetails={patchUserDetails}
               />
             </Route>
